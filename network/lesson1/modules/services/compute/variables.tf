@@ -22,7 +22,7 @@ variable "zone" {
 variable "nics" {
   type                            = list(object({
                                       network_name  = string
-                                      subnet_name   = string
+                                      subnet_name   = optional(string)
                                     }))
   description                     = "NICs to be connected to the new instance will be created."
 }

@@ -3,7 +3,7 @@ terraform {
   experiments = [module_variable_optional_attrs]
 }
 
-resource "google_compute_instance" "mynet-us-vm" {
+resource "google_compute_instance" "compute_instance" {
   project       = var.project_id
   name          = var.instance_name
   machine_type  = var.machine_type
@@ -17,7 +17,7 @@ resource "google_compute_instance" "mynet-us-vm" {
 
   dynamic "network_interface" {
     for_each = {
-      for nic in var.nics: "${nic.network_name}.${nic.subnet_name}" => nic
+      for nic in var.nics: "${nic.network_name}.${coalesce(nic.subnet_name,"default")}" => nic
     }
 
     content {
