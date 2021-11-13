@@ -1,8 +1,6 @@
 package test
 
 import (
-	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
@@ -29,14 +27,7 @@ func TestTerraformComputeResourceExample(t *testing.T) {
 	terraform.InitAndApply(t, opts)
 
 	// Run `terraform output` to get the values of output variables
-	actualProjectId := terraform.Output(t, opts, "project_id")
 	actualComputeResourceId := terraform.Output(t, opts, "computer_resource_id")
-
-	// website::tag::3::Check the output against expected values.
-	// Verify we're getting back the outputs we expect
-	assert.NotNil(t, actualProjectId, "project_id should not be null")
-	assert.NotEmpty(t, actualProjectId, "project_id should not be empty")
-	assert.True(t, strings.HasPrefix(actualProjectId, actualProjectId), fmt.Sprintf("projectId should start with %s", actualProjectId))
 
 	assert.NotNil(t, actualComputeResourceId, "computer_resource_id should not be null")
 	assert.NotEmpty(t, actualComputeResourceId, "computer_resource_id should not empty")

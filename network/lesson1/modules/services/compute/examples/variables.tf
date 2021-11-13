@@ -1,4 +1,4 @@
-variable "billing_account" {
+variable "project_id" {
   type        = string
-  description = "GCP Billing Account"
+  description = "GCP Project ID"
 }
