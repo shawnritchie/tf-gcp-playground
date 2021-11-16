@@ -2,7 +2,7 @@ output "computer_resource_id" {
   value = google_compute_instance.compute_instance.id
 }
 
-output "address" {
+output "public_ip" {
   description = "The public IP of the bastion host."
   value       = flatten([
                   for nic in google_compute_instance.compute_instance.network_interface:

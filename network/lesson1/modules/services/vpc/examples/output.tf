@@ -15,11 +15,11 @@ output us_b_computer_resource_id {
 }
 
 output "us_a_nat" {
-  value = module.us-a-instance.address
+  value = module.us-a-instance.public_ip
 }
 
 output "us_b_nat" {
-  value = module.us-b-instance.address
+  value = module.us-b-instance.public_ip
 }
 
 output "us_a_private_ips" {
