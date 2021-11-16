@@ -14,5 +14,4 @@ module "compute_instance" {
   nics = [{
     network_name  = "default"
   }]
-
 }

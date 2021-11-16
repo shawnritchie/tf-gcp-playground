@@ -19,11 +19,21 @@ variable "zone" {
   description                     = "Zone in which the new instance will be created."
 }
 
+variable "nic0" {
+  type = object({
+    network_name        = string
+    subnet_name         = optional(string)
+    ephemeral_public_ip = optional(bool)
+  })
+  description = "nic0 Definition { name, region cidr } - DHCP connectivity"
+  default = null
+}
+
 variable "nics" {
   type                            = list(object({
-                                      network_name  = string
-                                      subnet_name   = optional(string)
+                                      network_name        = string
+                                      subnet_name         = optional(string)
+                                      ephemeral_public_ip = optional(bool)
                                     }))
   description                     = "NICs to be connected to the new instance will be created."
 }
-

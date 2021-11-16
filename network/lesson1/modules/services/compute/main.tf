@@ -16,6 +16,23 @@ resource "google_compute_instance" "compute_instance" {
   }
 
   dynamic "network_interface" {
+    for_each = var.nic0 == null ? [] : [var.nic0]
+
+    content {
+      network = network_interface.value["network_name"]
+      subnetwork_project = var.project_id
+      subnetwork = network_interface.value["subnet_name"]
+
+      dynamic "access_config" {
+        for_each = toset(coalesce(network_interface.value["ephemeral_public_ip"], false) ? [
+          ""] : [])
+        content {}
+      }
+    }
+  }
+
+
+  dynamic "network_interface" {
     for_each = {
       for nic in var.nics: "${nic.network_name}.${coalesce(nic.subnet_name,"default")}" => nic
     }
@@ -24,6 +41,11 @@ resource "google_compute_instance" "compute_instance" {
       network             = network_interface.value["network_name"]
       subnetwork_project  = var.project_id
       subnetwork          = network_interface.value["subnet_name"]
+
+      dynamic "access_config" {
+        for_each = toset(coalesce(network_interface.value["ephemeral_public_ip"], false) ? [""] : [])
+        content {}
+      }
     }
   }
 }
