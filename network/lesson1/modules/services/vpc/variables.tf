@@ -14,6 +14,12 @@ variable "auto_create_subnetworks" {
   default                         = false
 }
 
+variable "connect_to_default_internet_gateway" {
+  type                            = bool
+  description                     = "Should the VPC have a route to the default internet gateway"
+  default                         = false
+}
+
 variable "vpc_subnets" {
   type = map(object({
     name      = string

@@ -163,8 +163,7 @@ module "networks" {
   vpc_subnets = lookup(each.value, "subnets", {})
   ingress_rules = merge(local.ingress, lookup(each.value, "ingress", {}))
 
-  depends_on = [
-    module.project_container]
+  depends_on = [module.project_container]
 }
 
 resource "google_compute_network_peering" "to" {
