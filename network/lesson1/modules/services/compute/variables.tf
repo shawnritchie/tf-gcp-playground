@@ -19,6 +19,21 @@ variable "zone" {
   description                     = "Zone in which the new instance will be created."
 }
 
+variable "ssh_key" {
+  type = object({
+    ssh_user            = string
+    ssh_pub_key         = string
+  })
+  description = "User & Public key to use for ssh login"
+  default = null
+}
+
+variable "os_login" {
+  type        = bool
+  description = "Should os login be enabled"
+  default     = false
+}
+
 variable "nic0" {
   type = object({
     network_name        = string

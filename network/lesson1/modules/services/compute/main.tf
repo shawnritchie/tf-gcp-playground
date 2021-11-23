@@ -15,6 +15,15 @@ resource "google_compute_instance" "compute_instance" {
     }
   }
 
+  metadata = merge(
+      {enable-oslogin = var.os_login},
+      var.ssh_key != null ? {
+        ssh-keys = <<EOT
+        ${var.ssh_key.ssh_user}:${var.ssh_key.ssh_pub_key}
+        EOT
+      } : {}
+  )
+
   dynamic "network_interface" {
     for_each = var.nic0 == null ? [] : [var.nic0]
 

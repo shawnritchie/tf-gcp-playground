@@ -1,10 +1,9 @@
 package test
 
 import (
-	"testing"
-
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestTerraformComputeResourceExample(t *testing.T) {
@@ -13,7 +12,7 @@ func TestTerraformComputeResourceExample(t *testing.T) {
 	opts := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		// website::tag::1::Set the path to the Terraform code that will be tested.
 		// The path to where our Terraform code is located
-		TerraformDir: "../examples",
+		TerraformDir: "../examples/private",
 
 		// Variables to pass to our Terraform code using -var-file options
 		VarFiles: []string{"varfile.tfvars"},
