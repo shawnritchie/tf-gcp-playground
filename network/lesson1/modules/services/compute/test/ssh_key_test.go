@@ -7,21 +7,20 @@ import (
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
 	"log"
-	"os"
 	"testing"
 )
 
 func TestTerraformSSHKeyExample(t *testing.T) {
 	t.Parallel()
 
-	os.Setenv("SKIP_sshkey_bootstrap", "true")
-	os.Setenv("SKIP_sshkey_deploy", "true")
-	os.Setenv("SKIP_sshkey_test_setup", "true")
-	os.Setenv("SKIP_sshkey_test_icmp", "true")
-	os.Setenv("SKIP_sshkey_test_ssh", "true")
+	//os.Setenv("SKIP_sshkey_bootstrap", "true")
+	//os.Setenv("SKIP_sshkey_deploy", "true")
+	//os.Setenv("SKIP_sshkey_test_setup", "true")
+	//os.Setenv("SKIP_sshkey_test_icmp", "true")
+	//os.Setenv("SKIP_sshkey_test_ssh", "true")
 	//os.Setenv("SKIP_sshkey_teardown", "true")
 
-	testCtx := getTestContext(t, "../../", "compute/examples/ssh-key")
+	testCtx := createTestContext(t, "../../", "compute/examples/ssh-key")
 	cpExampleDir := testCtx.testFolder
 
 	test_structure.RunTestStage(t, "sshkey_bootstrap", func() {

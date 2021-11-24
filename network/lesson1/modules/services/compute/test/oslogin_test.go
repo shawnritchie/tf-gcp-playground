@@ -7,21 +7,20 @@ import (
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
 	"log"
-	"os"
 	"testing"
 )
 
 func TestTerraformOsLoginExample(t *testing.T) {
 	t.Parallel()
 
-	os.Setenv("SKIP_oslogin_bootstrap", "true")
-	os.Setenv("SKIP_oslogin_deploy", "true")
-	os.Setenv("SKIP_oslogin_teardown", "true")
-	os.Setenv("SKIP_oslogin_test_setup", "true")
-	os.Setenv("SKIP_oslogin_test_icmp", "true")
-	os.Setenv("SKIP_oslogin_test_ssh", "true")
+	//os.Setenv("SKIP_oslogin_bootstrap", "true")
+	//os.Setenv("SKIP_oslogin_deploy", "true")
+	//os.Setenv("SKIP_oslogin_teardown", "true")
+	//os.Setenv("SKIP_oslogin_test_setup", "true")
+	//os.Setenv("SKIP_oslogin_test_icmp", "true")
+	//os.Setenv("SKIP_oslogin_test_ssh", "true")
 
-	testCtx := getTestContext(t, "../../", "compute/examples/oslogin")
+	testCtx := createTestContext(t, "../../", "compute/examples/oslogin")
 	cpExampleDir := testCtx.testFolder
 
 	test_structure.RunTestStage(t, "oslogin_bootstrap", func() {

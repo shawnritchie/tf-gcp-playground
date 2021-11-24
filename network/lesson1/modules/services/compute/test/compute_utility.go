@@ -28,7 +28,7 @@ type testContext struct {
 	testFolder string
 }
 
-func getTestContext(t *testing.T, rootFolder, terraformModuleFolder string) *testContext {
+func createTestContext(t *testing.T, rootFolder, terraformModuleFolder string) *testContext {
 	cpTerraformFolder := test_structure.CopyTerraformFolderToTemp(t, rootFolder, terraformModuleFolder)
 	if _, err := os.Stat(fmt.Sprintf("%s%s/.test-data/TerraformOptions.json", rootFolder, terraformModuleFolder)); err == nil {
 		return &testContext{
