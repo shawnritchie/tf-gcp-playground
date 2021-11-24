@@ -22,7 +22,7 @@ module "us-a-network" {
 
   ingress_rules = {
     allow-icmp = {
-      source_ranges = ["10.128.0.0/20"]
+      source_ranges = ["10.128.0.0/20", "10.130.0.0/20"]
       rules = [{
         protocol = "icmp"
       }]
@@ -53,7 +53,7 @@ module "us-b-network" {
       }]
     }
     allow-icmp-internal = {
-      source_ranges = ["10.128.0.0/20"]
+      source_ranges = ["10.128.0.0/20", "10.130.0.0/20"]
       rules = [{
         protocol = "icmp"
       }]
@@ -90,6 +90,7 @@ module "us-b-instance" {
   project_id = var.project_id
   instance_name = "us-b-instance"
   zone = "us-central1-b"
+  os_login = true
 
   nic0 = {
     network_name        = "us-b-network"
