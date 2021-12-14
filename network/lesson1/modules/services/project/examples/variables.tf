@@ -10,6 +10,7 @@ variable "project_name" {
 }
 
 variable "service_api" {
-  type = list(string)
+  type        = list(string)
   description = "List of GCP APIs to be enabled for this account"
+  default     = []
 }

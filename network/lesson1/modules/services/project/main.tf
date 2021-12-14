@@ -2,6 +2,17 @@ terraform {
   required_version = ">= 1.0"
 }
 
+locals {
+  policy = flatten([
+    for role in var.default_roles: [
+      for member in var.members: {
+        role: role
+        member: member
+      }
+    ]
+  ])
+}
+
 resource "random_string" "project_ext" {
   length           = 6
   special          = false
@@ -14,6 +25,21 @@ resource "google_project" "gcp_project" {
   project_id          = format("%s-%s", var.project_name, random_string.project_ext.result)
   billing_account     = var.billing_account
   auto_create_network = var.create_default_network
+
+  org_id              = var.org_id
+  folder_id           = var.folder_id
+}
+
+resource "google_project_iam_member" gcp_policy {
+  for_each = {
+    for p in local.policy: "${p.role}-${p.member}" => p
+  }
+
+  project = google_project.gcp_project.project_id
+  role    = each.value.role
+  member = each.value.member
+
+  depends_on = [google_project.gcp_project]
 }
 
 resource "google_project_service" "enable_compute" {
