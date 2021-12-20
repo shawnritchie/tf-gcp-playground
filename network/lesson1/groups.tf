@@ -1,21 +1,8 @@
-terraform {
-  required_version = ">= 1.0"
-  experiments = [module_variable_optional_attrs]
-  backend "local" {
-    path = "./state/terraform.tfstate"
-  }
-}
-
-locals {
-  customerId = "C015bbxfj"
-  domain     = "spinvadors.com"
-}
-
 module "gcp-organization-admins" {
   source = "./modules/services/iam/groups"
 
-  customer_id = local.customerId
-  domain      = local.domain
+  customer_id = var.customer_id
+  domain      = var.domain
   group_name  = "gcp-organization-admins"
   org_roles   = ["roles/resourcemanager.organizationAdmin",
                 "roles/resourcemanager.folderAdmin",
@@ -30,8 +17,8 @@ module "gcp-organization-admins" {
 module "gcp-network-admins" {
   source = "./modules/services/iam/groups"
 
-  customer_id = local.customerId
-  domain      = local.domain
+  customer_id = var.customer_id
+  domain      = var.domain
   group_name  = "gcp-network-admins"
   org_roles   = ["roles/compute.networkAdmin",
                 "roles/compute.xpnAdmin",
@@ -42,16 +29,16 @@ module "gcp-network-admins" {
 module "gcp-billing-admins"  {
   source = "./modules/services/iam/groups"
 
-  customer_id = local.customerId
-  domain      = local.domain
+  customer_id = var.customer_id
+  domain      = var.domain
   group_name  = "gcp-billing-admins"
 }
 
 module "gcp-security-admins" {
   source = "./modules/services/iam/groups"
 
-  customer_id = local.customerId
-  domain      = local.domain
+  customer_id = var.customer_id
+  domain      = var.domain
   group_name  = "gcp-security-admins"
   org_roles   = ["roles/orgpolicy.policyAdmin",
                 "roles/orgpolicy.policyViewer",
@@ -69,8 +56,8 @@ module "gcp-security-admins" {
 module "gcp-devops"  {
   source = "./modules/services/iam/groups"
 
-  customer_id = local.customerId
-  domain      = local.domain
+  customer_id = var.customer_id
+  domain      = var.domain
   group_name  = "gcp-devops"
   org_roles   = ["roles/resourcemanager.folderViewer"]
 }
@@ -78,7 +65,7 @@ module "gcp-devops"  {
 module "gcp-developers"  {
   source = "./modules/services/iam/groups"
 
-  customer_id = local.customerId
-  domain      = local.domain
+  customer_id = var.customer_id
+  domain      = var.domain
   group_name  = "gcp-developers"
 }

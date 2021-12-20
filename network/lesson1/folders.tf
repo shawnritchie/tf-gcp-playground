@@ -1,20 +1,3 @@
-terraform {
-  required_version = ">= 1.0"
-  experiments = [module_variable_optional_attrs]
-  backend "local" {
-    path = "./state/terraform.tfstate"
-  }
-}
-
-locals {
-  domain     = "spinvadors.com"
-}
-
-
-data "google_organization" "org" {
-  domain = local.domain
-}
-
 module "production_folder" {
   source = "./modules/services/folder"
 

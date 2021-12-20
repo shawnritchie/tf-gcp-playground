@@ -1,20 +1,5 @@
-terraform {
-  required_version = ">= 1.0"
-  experiments = [module_variable_optional_attrs]
-  backend "local" {
-    path = "./state/terraform.tfstate"
-  }
-}
-
 locals {
-  customerId = "C015bbxfj"
-  domain     = "spinvadors.com"
-  spinvadorsEmail = "@${local.domain}"
-}
-
-
-data "google_organization" "org" {
-  domain = local.domain
+  spinvadorsEmail = "@${var.domain}"
 }
 
 module "project-vpc-host-dev" {
@@ -22,7 +7,7 @@ module "project-vpc-host-dev" {
 
   project_name    = "vpc-host-dev"
   billing_account = var.gcp_billing_account
-  service_api     = []
+  service_api     = ["compute.googleapis.com"]
   default_roles   = ["roles/owner"]
   folder_id       = module.dev_folder.folder_id
   members         = [
@@ -35,7 +20,7 @@ module "project-vpc-host-prod" {
 
   project_name    = "vpc-host-prod"
   billing_account = var.gcp_billing_account
-  service_api     = []
+  service_api     = ["compute.googleapis.com"]
   default_roles   = ["roles/owner"]
   folder_id       = module.production_folder.folder_id
   members         = [

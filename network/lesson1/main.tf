@@ -1,15 +1,3 @@
-terraform {
-  required_version = ">= 1.0"
-  experiments = [module_variable_optional_attrs]
-  backend "local" {
-    path = "./state/terraform.tfstate"
-  }
-}
-
-provider "google" {
-  region = var.gcp_region
-}
-
 locals {
   ingress = {
     allow-ssh = {
@@ -143,27 +131,17 @@ locals {
   ])
 }
 
-module "project_container" {
-  source = "./modules/services/project"
-
-  project_name = var.project_name
-  billing_account = var.gcp_billing_account
-  service_api = [
-    "compute.googleapis.com"
-  ]
-}
-
 module "networks" {
   for_each = local.networks
 
   source = "./modules/services/vpc"
 
-  project_id = module.project_container.project_id
+  project_id = module.project-vpc-host-prod.project_id
   vpc_name = each.value.network_name
   vpc_subnets = lookup(each.value, "subnets", {})
   ingress_rules = merge(local.ingress, lookup(each.value, "ingress", {}))
 
-  depends_on = [module.project_container]
+  depends_on = [module.project-vpc-host-prod]
 }
 
 resource "google_compute_network_peering" "to" {
@@ -183,7 +161,7 @@ module "instances" {
     for compute in local.compute: compute.instance_name => compute
   }
 
-  project_id = module.project_container.project_id
+  project_id =  module.project-vpc-host-prod.project_id
   instance_name = each.value.instance_name
   machine_type = lookup(each.value, "machine_type", "e2-medium")
   zone = each.value.zone
