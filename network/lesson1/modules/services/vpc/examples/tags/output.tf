@@ -1,31 +1,31 @@
-output private_vpc_id {
-  value = module.private-network.vpc_id
+output us_a_vpc_id {
+  value = module.us-a-network.vpc_id
 }
 
-output public_vpc_id {
-  value = module.public-network.vpc_id
+output us_b_vpc_id {
+  value = module.us-b-network.vpc_id
 }
 
-output private_computer_resource_id {
-  value = module.private-instance.computer_resource_id
+output us_a_computer_resource_id {
+  value = module.us-a-instance.computer_resource_id
 }
 
-output "private_nat" {
-  value = module.private-instance.public_ip
+output "us_a_nat" {
+  value = module.us-a-instance.public_ip
 }
 
-output "private_instance_private_ips" {
-  value = module.private-instance.private_ip
+output "us_a_private_ips" {
+  value = module.us-a-instance.private_ip
 }
 
-output public_computer_resource_id {
-  value = module.public-instance.computer_resource_id
+output us_b_computer_resource_id {
+  value = module.us-b-instance.computer_resource_id
 }
 
-output "public_nat" {
-  value = module.public-instance.public_ip
+output "us_b_nat" {
+  value = module.us-b-instance.public_ip
 }
 
-output "public_instance_private_ips" {
-  value = module.public-instance.private_ip
+output "us_b_private_ips" {
+  value = module.us-b-instance.private_ip
 }

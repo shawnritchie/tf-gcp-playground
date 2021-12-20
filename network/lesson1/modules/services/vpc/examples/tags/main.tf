@@ -5,7 +5,7 @@ terraform {
   }
 }
 
-module "private-network" {
+module "us-a-network" {
   source = "../.."
 
   project_id = var.project_id
@@ -30,7 +30,7 @@ module "private-network" {
   }
 }
 
-module "public-network" {
+module "us-b-network" {
   source = "../.."
 
   project_id = var.project_id
@@ -54,6 +54,13 @@ module "public-network" {
         ports = ["22"]
       }]
     }
+    allow-icmp = {
+      source_ranges = ["0.0.0.0/0"]
+      target_tags   = ["public-instance"]
+      rules = [{
+        protocol = "icmp"
+      }]
+    }
     allow-icmp-internal = {
       source_tags = ["public-instance", "private-instance"]
       rules = [{
@@ -63,7 +70,7 @@ module "public-network" {
   }
 }
 
-module "private-instance" {
+module "us-a-instance" {
   source = "../../../compute"
 
   project_id = var.project_id
@@ -77,10 +84,10 @@ module "private-instance" {
     }
   ]
 
-  depends_on = [module.private-network]
+  depends_on = [module.us-a-network]
 }
 
-module "public-instance" {
+module "us-b-instance" {
   source = "../../../compute"
 
   project_id = var.project_id
@@ -102,5 +109,5 @@ module "public-instance" {
     }
   ]
 
-  depends_on = [module.public-network, module.private-network]
+  depends_on = [module.us-a-network, module.us-b-network]
 }
