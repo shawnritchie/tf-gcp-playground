@@ -13,8 +13,8 @@ const (
 	osLoginBastionPublicIP	 = "us_b_nat"
 
 	sshUsername				 = "SSH_USERNAME"
-	projectId				 = "tf-state-329314"
-	userEmail				 = "sracggcp@gmail.com"
+	projectId				 = "tf-examples-335715"
+	userEmail				 = "shawn.ritchie@spinvadors.com"
 
 	SSHMaxRetries 			 = 2
 	SSHMaxRetriesExpectError = 3

@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestTerraformVPCResourceExample(t *testing.T) {
+func TestTagFireWallVPCResourceExample(t *testing.T) {
 	t.Parallel()
 
 	//os.Setenv("SKIP_bootstrap", "true")
@@ -20,7 +20,7 @@ func TestTerraformVPCResourceExample(t *testing.T) {
 	//os.Setenv("SKIP_test_icmp", "true")
 	//os.Setenv("SKIP_test_private_vpc", "true")
 
-	testCtx := createTestContext(t, "../../", "vpc/examples/ingress")
+	testCtx := createTestContext(t, "../../", "vpc/examples/tags")
 	vpcExampleDir := testCtx.testFolder
 
 	test_structure.RunTestStage(t, "bootstrap", func() {
