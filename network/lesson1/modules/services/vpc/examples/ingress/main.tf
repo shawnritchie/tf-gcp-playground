@@ -6,7 +6,7 @@ terraform {
 }
 
 module "us-a-network" {
-  source = "../"
+  source = "..\/.."
 
   project_id = var.project_id
   vpc_name = "us-a-network"
@@ -31,7 +31,7 @@ module "us-a-network" {
 }
 
 module "us-b-network" {
-  source = "../"
+  source = "..\/.."
 
   project_id = var.project_id
   vpc_name = "us-b-network"
@@ -69,7 +69,7 @@ module "us-b-network" {
 }
 
 module "us-a-instance" {
-  source = "../../compute"
+  source = "..\/..\/..\/compute"
 
   project_id = var.project_id
   instance_name = "us-a-instance"
@@ -85,7 +85,7 @@ module "us-a-instance" {
 }
 
 module "us-b-instance" {
-  source = "../../compute"
+  source = "..\/..\/..\/compute"
 
   project_id = var.project_id
   instance_name = "us-b-instance"
