@@ -5,7 +5,7 @@ terraform {
   }
 }
 
-module "us-a-network" {
+module "private-network" {
   source = "../.."
 
   project_id = var.project_id
@@ -22,7 +22,7 @@ module "us-a-network" {
 
   ingress_rules = {
     allow-icmp = {
-      source_ranges = ["10.128.0.0/20", "10.130.0.0/20"]
+      source_tags = ["public-instance"]
       rules = [{
         protocol = "icmp"
       }]
@@ -30,7 +30,7 @@ module "us-a-network" {
   }
 }
 
-module "us-b-network" {
+module "public-network" {
   source = "../.."
 
   project_id = var.project_id
@@ -46,33 +46,29 @@ module "us-b-network" {
   }
 
   ingress_rules = {
-    allow-icmp = {
-      source_ranges = ["0.0.0.0/0"]
-      rules = [{
-        protocol = "icmp"
-      }]
-    }
-    allow-icmp-internal = {
-      source_ranges = ["10.128.0.0/20", "10.130.0.0/20"]
-      rules = [{
-        protocol = "icmp"
-      }]
-    }
     allow-ssh = {
       source_ranges = ["0.0.0.0/0"]
+      target_tags   = ["public-instance"]
       rules = [{
         protocol = "tcp"
         ports = ["22"]
       }]
     }
+    allow-icmp-internal = {
+      source_tags = ["public-instance", "private-instance"]
+      rules = [{
+        protocol = "icmp"
+      }]
+    }
   }
 }
 
-module "us-a-instance" {
+module "private-instance" {
   source = "../../../compute"
 
   project_id = var.project_id
-  instance_name = "us-a-instance"
+  instance_name = "private-instance"
+  tags = ["private-instance"]
   zone = "us-central1-a"
   nics = [
     {
@@ -81,14 +77,15 @@ module "us-a-instance" {
     }
   ]
 
-  depends_on = [module.us-a-network]
+  depends_on = [module.private-network]
 }
 
-module "us-b-instance" {
+module "public-instance" {
   source = "../../../compute"
 
   project_id = var.project_id
-  instance_name = "us-b-instance"
+  instance_name = "public-instance"
+  tags = ["public-instance"]
   zone = "us-central1-b"
   os_login = true
 
@@ -105,5 +102,5 @@ module "us-b-instance" {
     }
   ]
 
-  depends_on = [module.us-b-network, module.us-a-network]
+  depends_on = [module.public-network, module.private-network]
 }

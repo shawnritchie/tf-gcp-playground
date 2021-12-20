@@ -30,6 +30,8 @@ resource "google_compute_firewall" "ingress_rules" {
   network         = google_compute_network.vpc_network.id
   direction       = "INGRESS"
   source_ranges   = each.value.source_ranges
+  source_tags     = each.value.source_tags
+  target_tags     = each.value.target_tags
 
   dynamic "allow" {
     for_each = each.value.rules
