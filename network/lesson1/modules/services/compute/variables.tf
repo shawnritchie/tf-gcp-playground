@@ -52,3 +52,9 @@ variable "nics" {
                                     }))
   description                     = "NICs to be connected to the new instance will be created."
 }
+
+variable "tags" {
+  type = set(string)
+  description = "A list of network tags to attach to the instance."
+  default = []
+}

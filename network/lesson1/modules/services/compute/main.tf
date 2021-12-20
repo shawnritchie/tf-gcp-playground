@@ -8,6 +8,7 @@ resource "google_compute_instance" "compute_instance" {
   name          = var.instance_name
   machine_type  = var.machine_type
   zone          = var.zone
+  tags          = var.tags
 
   boot_disk {
     initialize_params {
