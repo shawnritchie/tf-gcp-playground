@@ -32,13 +32,16 @@ variable "vpc_subnets" {
 
 variable "ingress_rules" {
   type = map(object({
-    source_ranges = optional(set(string))
-    source_tags   = optional(set(string))
-    target_tags   = optional(set(string))
-    rules         = list(object({
-                      protocol = string
-                      ports = optional(set(string))
-                    }))
+    source_ranges             = optional(set(string))
+    destination_ranges        = optional(set(string))
+    source_tags               = optional(set(string))
+    target_tags               = optional(set(string))
+    source_service_accounts   = optional(set(string))
+    target_service_accounts   = optional(set(string))
+    rules                     = list(object({
+                                  protocol = string
+                                  ports = optional(set(string))
+                                }))
   }))
   description = "Ingress rules to be applied to the VPC and subnets"
   default = {}
