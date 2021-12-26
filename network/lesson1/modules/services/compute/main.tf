@@ -58,6 +58,15 @@ resource "google_compute_instance" "compute_instance" {
       }
     }
   }
+
+  dynamic "service_account" {
+    for_each = var.service_account == null ? {} : {sa: var.service_account}
+
+    content {
+      email = service_account.value["email"]
+      scopes = service_account.value["scopes"]
+    }
+  }
 }
 
 

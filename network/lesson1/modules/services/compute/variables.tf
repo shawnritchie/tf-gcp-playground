@@ -34,6 +34,15 @@ variable "os_login" {
   default     = false
 }
 
+variable "service_account" {
+  type = object({
+    email = string
+    scopes = list(string)
+  })
+  description = "Service account to attach to the instance."
+  default = null
+}
+
 variable "nic0" {
   type = object({
     network_name        = string
