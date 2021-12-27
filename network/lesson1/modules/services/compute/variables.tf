@@ -46,6 +46,7 @@ variable "service_account" {
 variable "nic0" {
   type = object({
     network_name        = string
+    subnetwork_project  = optional(string)
     subnet_name         = optional(string)
     ephemeral_public_ip = optional(bool)
   })
@@ -55,7 +56,8 @@ variable "nic0" {
 
 variable "nics" {
   type                            = list(object({
-                                      network_name        = string
+                                      network_name        = optional(string)
+                                      subnetwork_project  = optional(string)
                                       subnet_name         = optional(string)
                                       ephemeral_public_ip = optional(bool)
                                     }))

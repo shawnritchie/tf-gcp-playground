@@ -29,13 +29,12 @@ resource "google_compute_instance" "compute_instance" {
     for_each = var.nic0 == null ? [] : [var.nic0]
 
     content {
-      network = network_interface.value["network_name"]
-      subnetwork_project = var.project_id
-      subnetwork = network_interface.value["subnet_name"]
+      network             = network_interface.value["network_name"]
+      subnetwork_project  = network_interface.value["subnetwork_project"]
+      subnetwork          = network_interface.value["subnet_name"]
 
       dynamic "access_config" {
-        for_each = toset(coalesce(network_interface.value["ephemeral_public_ip"], false) ? [
-          ""] : [])
+        for_each = toset(coalesce(network_interface.value["ephemeral_public_ip"], false) ? [""] : [])
         content {}
       }
     }
@@ -44,12 +43,12 @@ resource "google_compute_instance" "compute_instance" {
 
   dynamic "network_interface" {
     for_each = {
-      for nic in var.nics: "${nic.network_name}.${coalesce(nic.subnet_name,"default")}" => nic
+      for nic in var.nics: "${coalesce(nic.network_name,"default")}.${coalesce(nic.subnetwork_project,"default")}.${coalesce(nic.subnet_name,"default")}" => nic
     }
 
     content {
       network             = network_interface.value["network_name"]
-      subnetwork_project  = var.project_id
+      subnetwork_project  = network_interface.value["subnetwork_project"]
       subnetwork          = network_interface.value["subnet_name"]
 
       dynamic "access_config" {
