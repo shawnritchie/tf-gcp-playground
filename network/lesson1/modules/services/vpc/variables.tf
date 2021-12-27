@@ -46,3 +46,9 @@ variable "ingress_rules" {
   description = "Ingress rules to be applied to the VPC and subnets"
   default = {}
 }
+
+variable "shared_vpc_service_projects" {
+  type        = map(string)
+  description = "The IDs of the project that will serve as a shared VPC service project"
+  default     = {}
+}

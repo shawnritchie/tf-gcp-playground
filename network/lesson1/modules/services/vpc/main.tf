@@ -29,7 +29,9 @@ resource "google_compute_firewall" "ingress_rules" {
   name            = format("%s-%s", var.vpc_name, each.key)
   network         = google_compute_network.vpc_network.id
   direction       = "INGRESS"
+
   source_ranges   = each.value.source_ranges
+  destination_ranges = each.value.destination_ranges
 
   source_tags     = each.value.source_tags
   target_tags     = each.value.target_tags
@@ -47,4 +49,19 @@ resource "google_compute_firewall" "ingress_rules" {
   }
 
   depends_on = [google_compute_network.vpc_network]
+}
+
+resource "google_compute_shared_vpc_host_project" "shared_vpc_host_project" {
+  count = length(var.shared_vpc_service_projects) > 0 ? 1 : 0
+
+  project = var.project_id
+}
+
+resource "google_compute_shared_vpc_service_project" "shared_vpc_service_projects" {
+  for_each = var.shared_vpc_service_projects
+
+  host_project = var.project_id
+  service_project = each.value
+
+  depends_on = [google_compute_shared_vpc_host_project.shared_vpc_host_project]
 }
