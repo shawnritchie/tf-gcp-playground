@@ -1,5 +1,5 @@
-variable "project_id" {
+variable "billing_account" {
   type        = string
-  description = "GCP Project ID"
-  default     = "tf-state-329314"
+  description = "GCP Billing Account"
+  default     = "01B2E0-CE2A1C-88E698"
 }

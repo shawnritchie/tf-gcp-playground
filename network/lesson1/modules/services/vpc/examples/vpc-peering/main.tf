@@ -5,10 +5,21 @@ terraform {
   }
 }
 
+module "host_project_container" {
+  source = "../../../project"
+
+  project_name = "host-project"
+  billing_account = var.billing_account
+  service_api     = ["compute.googleapis.com"]
+  default_roles   = ["roles/owner"]
+}
+
+
+//PRIVATE
 module "us-a-network" {
   source = "../.."
 
-  project_id = var.project_id
+  project_id = module.host_project_container.project_id
   vpc_name = "us-a-network"
   connect_to_default_internet_gateway = false
 
@@ -30,10 +41,11 @@ module "us-a-network" {
   }
 }
 
+//PUBLIC
 module "us-b-network" {
   source = "../.."
 
-  project_id = var.project_id
+  project_id = module.host_project_container.project_id
   vpc_name = "us-b-network"
   connect_to_default_internet_gateway = true
 
@@ -52,12 +64,6 @@ module "us-b-network" {
         protocol = "icmp"
       }]
     }
-    allow-icmp-internal = {
-      source_ranges = ["10.128.0.0/20", "10.130.0.0/20"]
-      rules = [{
-        protocol = "icmp"
-      }]
-    }
     allow-ssh = {
       source_ranges = ["0.0.0.0/0"]
       rules = [{
@@ -68,15 +74,26 @@ module "us-b-network" {
   }
 }
 
+module "vpc-peering" {
+  source = "../../../peering"
+
+  peer_networks = {
+    public = module.us-b-network.vpc_id
+    private = module.us-a-network.vpc_id
+  }
+}
+
+//PRIVATE
 module "us-a-instance" {
   source = "../../../compute"
 
-  project_id = var.project_id
+  project_id = module.host_project_container.project_id
   instance_name = "us-a-instance"
   zone = "us-central1-a"
+
   nics = [
     {
-      network_name  = "us-a-network"
+      subnetwork_project = module.host_project_container.project_id
       subnet_name   = "us-a-subnetwork"
     }
   ]
@@ -84,24 +101,20 @@ module "us-a-instance" {
   depends_on = [module.us-a-network]
 }
 
+//PUBLIC
 module "us-b-instance" {
   source = "../../../compute"
 
-  project_id = var.project_id
+  project_id = module.host_project_container.project_id
   instance_name = "us-b-instance"
   zone = "us-central1-b"
   os_login = true
 
-  nic0 = {
-    network_name        = "us-b-network"
-    subnet_name         = "us-b-subnetwork"
-    ephemeral_public_ip = true
-  }
-
   nics = [
     {
-      network_name  = "us-a-network"
-      subnet_name   = "us-a-subnetwork"
+      subnetwork_project = module.host_project_container.project_id
+      subnet_name         = "us-b-subnetwork"
+      ephemeral_public_ip = true
     }
   ]
 

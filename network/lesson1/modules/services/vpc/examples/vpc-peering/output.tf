@@ -1,3 +1,7 @@
+output "projectId" {
+  value = module.host_project_container.project_id
+}
+
 output us_a_vpc_id {
   value = module.us-a-network.vpc_id
 }

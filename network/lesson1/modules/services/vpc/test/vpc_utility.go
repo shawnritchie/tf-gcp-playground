@@ -43,8 +43,12 @@ func createTestContext(t *testing.T, rootFolder, terraformModuleFolder string) *
 	}
 }
 
+func (ctx *testContext) extractOutput(outputKey string) string {
+	return terraform.Output(ctx.t, ctx.opt, outputKey)
+}
+
 func (ctx *testContext) extractIP(outputKey string) string {
-	ip := terraform.Output(ctx.t, ctx.opt, outputKey)
+	ip := ctx.extractOutput(outputKey)
 	instanceExternalIP := extractFirstElementFromStringArray(ctx.t, ip)
 	return instanceExternalIP
 }

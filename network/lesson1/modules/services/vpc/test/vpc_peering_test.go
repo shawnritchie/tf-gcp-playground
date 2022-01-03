@@ -6,21 +6,20 @@ import (
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
-	"log"
+	"os"
 	"testing"
 )
 
-func TestTerraformVPCResourceExample(t *testing.T) {
+func TestTerraformVPCPeeringResourceExample(t *testing.T) {
 	t.Parallel()
 
-	//os.Setenv("SKIP_bootstrap", "true")
-	//os.Setenv("SKIP_deploy", "true")
+	os.Setenv("SKIP_bootstrap", "true")
+	os.Setenv("SKIP_deploy", "true")
 	//os.Setenv("SKIP_teardown", "true")
-	//os.Setenv("SKIP_test_setup", "true")
-	//os.Setenv("SKIP_test_icmp", "true")
-	//os.Setenv("SKIP_test_private_vpc", "true")
+	os.Setenv("SKIP_test_setup", "true")
+	os.Setenv("SKIP_test_vpc_peering", "true")
 
-	testCtx := createTestContext(t, "../../", "vpc/examples/ingress")
+	testCtx := createTestContext(t, "../../", "vpc/examples/vpc-peering")
 	vpcExampleDir := testCtx.testFolder
 
 	test_structure.RunTestStage(t, "bootstrap", func() {
@@ -32,10 +31,6 @@ func TestTerraformVPCResourceExample(t *testing.T) {
 			TerraformDir: vpcExampleDir,
 
 			VarFiles: []string{"varfile.tfvars"},
-
-			EnvVars: map[string]string{
-				"GOOGLE_CLOUD_PROJECT": projectId,
-			},
 		})
 
 		test_structure.SaveTerraformOptions(t, vpcExampleDir, opts)
@@ -61,18 +56,10 @@ func TestTerraformVPCResourceExample(t *testing.T) {
 		testCtx.saveString(osLoginBastionPublicIP, publicIp)
 	})
 
-	test_structure.RunTestStage(t, "test_icmp", func() {
-		host := testCtx.loadString(osLoginBastionPublicIP)
-		stats := pingHost(t, host)
-
-		log.Printf("%d packets transmitted, %d packets received, %v%% packet loss\n",
-			stats.PacketsSent, stats.PacketsRecv, stats.PacketLoss)
-		assert.True(t, stats.PacketsRecv > 0, "at least single successfully ping")
-	})
-
-	test_structure.RunTestStage(t, "test_private_vpc", func() {
+	test_structure.RunTestStage(t, "test_vpc_peering", func() {
 		sshUserName := testCtx.loadString(sshUsername)
 		host := testCtx.loadString(osLoginBastionPublicIP)
+		projectId := testCtx.extractOutput("projectId")
 
 		keyPair := ssh.GenerateRSAKeyPair(t, 2048)
 		key := keyPair.PublicKey

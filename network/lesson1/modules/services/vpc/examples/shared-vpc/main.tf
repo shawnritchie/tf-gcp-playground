@@ -37,7 +37,7 @@ module "host-network" {
 
   project_id = module.host_project_container.project_id
   vpc_name = "host-network"
-  connect_to_default_internet_gateway = false
+  connect_to_default_internet_gateway = true
 
   vpc_subnets = {
     left = {
@@ -80,8 +80,9 @@ module "left-instance" {
   source = "../../../compute"
 
   project_id = module.left_source_project_container.project_id
-  instance_name = "us-a-instance"
+  instance_name = "left-instance"
   zone = "us-central1-a"
+
   nics = [
     {
       subnetwork_project  = module.host_project_container.project_id
@@ -96,12 +97,15 @@ module "right-instance" {
   source = "../../../compute"
 
   project_id = module.right_source_project_container.project_id
-  instance_name = "us-a-instance"
+  instance_name = "right-instance"
   zone = "us-central1-a"
+  os_login = true
+
   nics = [
     {
       subnetwork_project  = module.host_project_container.project_id
       subnet_name         = "right-subnetwork"
+      ephemeral_public_ip = true
     }
   ]
 
