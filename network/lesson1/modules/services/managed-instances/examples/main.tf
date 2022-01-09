@@ -81,6 +81,24 @@ module "instance_template" {
   depends_on = [module.host_project_container, module.vpc_network]
 }
 
+resource "google_compute_health_check" "health_check" {
+  project = module.host_project_container.project_id
+  name = "healthcheck-asg"
+  check_interval_sec = 5
+  timeout_sec = 5
+  healthy_threshold = 2
+  unhealthy_threshold = 5
+
+  http_health_check {
+    request_path  = "/"
+    port          = 80
+  }
+
+  log_config {
+    enable = true
+  }
+}
+
 module "autoscaling_group" {
   source = "../../managed-instances/group"
 
@@ -96,10 +114,11 @@ module "autoscaling_group" {
 
   cpu_utilisation = 0.7
 
-  http_healthcheck = {
-    path = "/"
-    port = 80
+  named_port = {
+    http: 80
   }
+
+  health_checks = [google_compute_health_check.health_check.id]
 
   depends_on = [module.host_project_container, module.vpc_network, module.instance_template]
 }

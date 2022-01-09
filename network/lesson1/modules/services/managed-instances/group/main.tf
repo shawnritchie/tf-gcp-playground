@@ -3,26 +3,6 @@ terraform {
   experiments = [module_variable_optional_attrs]
 }
 
-resource "google_compute_health_check" "health_check" {
-  count = var.http_healthcheck == null ? 0 : 1
-
-  project = var.project_id
-  name = format("healthcheck-%s", var.group_name)
-  check_interval_sec = 5
-  timeout_sec = 5
-  healthy_threshold = 2
-  unhealthy_threshold = 5
-
-  http_health_check {
-    request_path  = var.http_healthcheck.path
-    port          = var.http_healthcheck.port
-  }
-
-  log_config {
-    enable = true
-  }
-}
-
 resource "google_compute_target_pool" "pool" {
   name = format("pool-%s", var.group_name)
   project = var.project_id
@@ -38,9 +18,13 @@ resource "google_compute_region_instance_group_manager" "group" {
   distribution_policy_zones = var.zones
   distribution_policy_target_shape = "EVEN"
 
-  named_port {
-    name = "http"
-    port = 80
+  dynamic "named_port" {
+    for_each = var.named_port
+
+    content {
+      name = named_port.key
+      port = named_port.value
+    }
   }
 
   version {
@@ -50,7 +34,7 @@ resource "google_compute_region_instance_group_manager" "group" {
   target_pools = [google_compute_target_pool.pool.id]
 
   dynamic "auto_healing_policies" {
-    for_each = var.http_healthcheck == null ? {} : {health_check: google_compute_health_check.health_check[0].id}
+    for_each = toset(var.health_checks)
 
     content {
       health_check = auto_healing_policies.value
@@ -67,7 +51,7 @@ resource "google_compute_region_instance_group_manager" "group" {
 
   wait_for_instances = false
 
-  depends_on = [google_compute_target_pool.pool, google_compute_health_check.health_check]
+  depends_on = [google_compute_target_pool.pool]
 }
 
 resource "google_compute_region_autoscaler" "autoscaler" {

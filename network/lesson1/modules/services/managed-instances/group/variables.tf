@@ -27,14 +27,11 @@ variable "max_replicas" {
   type = number
 }
 
-variable "http_healthcheck" {
-  type    = object({
-    path = string
-    port = number
-  })
+variable "health_checks" {
+  type = list(string)
+  description = "List of google_compute_health_check.x.ids which the auto scaling group instances will be checked against for health"
   default = null
 }
-
 
 variable "cpu_utilisation" {
   type = number
@@ -53,4 +50,10 @@ variable "metrics" {
     type = optional(string)//GAUGE, DELTA_PER_SECOND, DELTA_PER_MINUTE
   }))
   default = []
+}
+
+variable "named_port" {
+  description = "named port mapping http: 80, https: 443"
+  type = map(number)
+  default = null
 }
