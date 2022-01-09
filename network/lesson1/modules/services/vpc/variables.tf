@@ -52,3 +52,9 @@ variable "shared_vpc_service_projects" {
   description = "The IDs of the project that will serve as a shared VPC service project"
   default     = {}
 }
+
+variable "routing_mode" {
+  type = string
+  description = "REGIONAL/GLOBAL"
+  default = "REGIONAL"
+}

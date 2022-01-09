@@ -30,6 +30,13 @@ resource "google_project" "gcp_project" {
   folder_id           = var.folder_id
 }
 
+resource "google_compute_project_default_network_tier" "network_tier" {
+  project = google_project.gcp_project.project_id
+  network_tier = var.network_tier
+
+  depends_on = [google_project.gcp_project]
+}
+
 resource "google_project_iam_member" gcp_policy {
   for_each = {
     for p in local.policy: "${p.role}-${p.member}" => p

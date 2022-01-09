@@ -43,3 +43,9 @@ variable "folder_id" {
   description = "Organisation ID under which the project will be created"
   default = null
 }
+
+variable "network_tier" {
+  type = string
+  description = "Network tier to be created in the following project PREMIUM/STANDARD"
+  default = "PREMIUM"
+}
