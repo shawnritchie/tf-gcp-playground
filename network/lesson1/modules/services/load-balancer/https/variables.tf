@@ -2,7 +2,6 @@
 # REQUIRED PARAMETERS
 # These variables are expected to be passed in by the operator
 # ---------------------------------------------------------------------------------------------------------------------
-
 variable "project" {
   description = "The project ID to create the resources in."
   type        = string
@@ -14,7 +13,12 @@ variable "name" {
 }
 
 variable "default_service" {
-  description = "Default backend service to be used"
+  description = "default backend service to be used"
+  type = string
+}
+
+variable "ip_address" {
+  description = "ip address which will direct traffic towards the load balancer"
   type = string
 }
 
@@ -27,14 +31,16 @@ variable "host_rule" {
   }))
 }
 
-variable "backend_instance_group" {
-  description = "Backend instance group self link which will be referenced by the load balancer"
-  type = string
-}
 # ---------------------------------------------------------------------------------------------------------------------
 # OPTIONAL MODULE PARAMETERS
 # These variables have defaults, but may be overridden by the operator.
 # ---------------------------------------------------------------------------------------------------------------------
+variable "publicly_exposed" {
+  description = "Is the load balancer exposed externally?"
+  type        = bool
+  default     = true
+}
+
 variable "enable_ssl" {
   description = "Set to true to enable ssl. If set to 'true', you will also have to provide 'var.ssl_certificates'."
   type        = bool

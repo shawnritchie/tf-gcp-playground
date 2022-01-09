@@ -3,18 +3,6 @@ terraform {
   experiments = [module_variable_optional_attrs]
 }
 
-
-# ------------------------------------------------------------------------------
-# CREATE A PUBLIC IP ADDRESS
-# ------------------------------------------------------------------------------
-
-resource "google_compute_global_address" "default" {
-  project      = var.project
-  name         = "${var.name}-address"
-  ip_version   = "IPV4"
-  address_type = "EXTERNAL"
-}
-
 # ------------------------------------------------------------------------------
 # HOST RULES WHICH DEFINES THE HOST AND PATH WHICH WILL BE DELEGATED TO THE
 # RIGHT BACKEND SERVICE
@@ -73,10 +61,8 @@ resource "google_compute_global_forwarding_rule" "http" {
   project    = var.project
   name       = "${var.name}-http-rule"
   target     = google_compute_target_http_proxy.http[0].self_link
-  ip_address = google_compute_global_address.default.address
+  ip_address = var.ip_address
   port_range = "80"
-
-  depends_on = [google_compute_global_address.default]
 
   labels = var.custom_labels
 }
@@ -102,9 +88,8 @@ resource "google_compute_global_forwarding_rule" "https" {
   count      = var.enable_ssl ? 1 : 0
   name       = "${var.name}-https-rule"
   target     = google_compute_target_https_proxy.default[0].self_link
-  ip_address = google_compute_global_address.default.address
+  ip_address = var.ip_address
   port_range = "443"
-  depends_on = [google_compute_global_address.default]
 
   labels = var.custom_labels
 }
@@ -123,5 +108,5 @@ resource "google_dns_record_set" "dns" {
 
   managed_zone = var.dns_managed_zone_name
 
-  rrdatas = [google_compute_global_address.default.address]
+  rrdatas = [var.ip_address]
 }
