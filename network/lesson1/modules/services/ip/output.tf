@@ -1,4 +1,4 @@
 output "address" {
   description = "IP address of the Cloud Load Balancer"
-  value       = var.vpc_id == null ? google_compute_global_address.public_ip[0].address : google_compute_address.private_ip[0].address
+  value       = concat(google_compute_global_address.global_public_ip, google_compute_address.regional_public_ip, google_compute_address.private_ip)[0].address
 }
