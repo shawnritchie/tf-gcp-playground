@@ -25,6 +25,7 @@ variable "vpc_subnets" {
     name      = string
     region    = string
     cidr      = string
+    purpose   = optional(string)
   }))
   description = "Subnet Definition { name, region cidr }"
   default = {}

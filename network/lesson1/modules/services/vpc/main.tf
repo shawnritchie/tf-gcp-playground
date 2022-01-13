@@ -20,6 +20,8 @@ resource "google_compute_subnetwork" "vpc_network_subnet" {
   ip_cidr_range = each.value.cidr
   region        = each.value.region
   network       = google_compute_network.vpc_network.id
+  purpose       = each.value.purpose
+  role          = each.value.purpose != null ? "ACTIVE" : null
 }
 
 resource "google_compute_firewall" "ingress_rules" {
