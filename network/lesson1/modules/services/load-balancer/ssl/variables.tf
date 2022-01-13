@@ -17,6 +17,14 @@ variable "default_service" {
   type = string
 }
 
+variable "certificates" {
+  description = "This resource provides a mechanism to upload an SSL key and certificate to the load balancer to serve secure connections from the user."
+  type = list(object({
+    private_key = string
+    certificate = string
+  }))
+}
+
 variable "ip_address" {
   description = "ip address which will direct traffic towards the load balancer"
   type = string
@@ -41,10 +49,4 @@ variable "custom_labels" {
   description = "A map of custom labels to apply to the resources. The key is the label name and the value is the label value."
   type        = map(string)
   default     = {}
-}
-
-variable "region" {
-  description = "Regional load balancer to be created in the following region"
-  type        = string
-  default     = null
 }

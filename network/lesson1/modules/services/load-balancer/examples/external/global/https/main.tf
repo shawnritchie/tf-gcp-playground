@@ -112,7 +112,7 @@ module "us_template" {
   depends_on = [module.host_project_container, module.vpc_network]
 }
 
-module "asg-us-west1" {
+module "asg-us" {
   source = "../../../../../managed-instances/group"
 
   project_id = module.host_project_container.project_id
@@ -201,7 +201,7 @@ resource "google_compute_backend_service" "default" {
 
   backend {
     balancing_mode = "UTILIZATION"
-    group = module.asg-us-west1.instance_group
+    group = module.asg-us.instance_group
   }
 
   backend {
@@ -210,7 +210,7 @@ resource "google_compute_backend_service" "default" {
   }
 
 
-  depends_on = [module.asg-us-west1, module.asg-eu, google_compute_health_check.health_check]
+  depends_on = [module.asg-us, module.asg-eu, google_compute_health_check.health_check]
 }
 
 module "load_balancer" {

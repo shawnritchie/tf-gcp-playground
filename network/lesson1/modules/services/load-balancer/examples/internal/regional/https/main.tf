@@ -6,9 +6,8 @@ terraform {
 }
 
 locals {
-  network_tier = "STANDARD"
-  region       = "us-west1"
-  zones        = ["us-west1-a", "us-west1-b"]
+  region = "us-west1"
+  zones = ["us-west1-a", "us-west1-b"]
 }
 
 module "host_project_container" {
@@ -38,7 +37,7 @@ module "vpc_network" {
       name = "us-proxy-subnetwork"
       cidr = "10.130.0.0/20"
       region = local.region
-      purpose = "REGIONAL_MANAGED_PROXY"
+      purpose = "INTERNAL_HTTPS_LOAD_BALANCER"
     }
   }
 
@@ -84,15 +83,15 @@ data "google_compute_subnetwork" "us-compute-subnetwork" {
   depends_on = [module.vpc_network]
 }
 
-module "public_ip" {
+module "private_ip" {
   source = "../../../../../ip"
 
   project = module.host_project_container.project_id
-  name = "external-lb-ip"
+  name = "internal-lb-ip"
   region = local.region
-  network_tier = local.network_tier
+  subnet_name = "us-compute-subnetwork"
 
-  depends_on = [module.vpc_network, data.google_compute_subnetwork.us-proxy-subnetwork]
+  depends_on = [data.google_compute_subnetwork.us-compute-subnetwork]
 }
 
 module "instance_template" {
@@ -190,7 +189,7 @@ resource "google_compute_region_backend_service" "default" {
   project                         = module.host_project_container.project_id
   region                          = local.region
   name                            = "backend-service"
-  load_balancing_scheme           = "EXTERNAL_MANAGED"
+  load_balancing_scheme           = "INTERNAL_MANAGED"
   protocol                        = "HTTP"
   session_affinity                = "NONE"
 
@@ -215,10 +214,10 @@ module "regional_load_balancer" {
   project = module.host_project_container.project_id
   default_service = google_compute_region_backend_service.default.self_link
 
-  load_balancing_scheme = "EXTERNAL_MANAGED"
-  network_tier          = "STANDARD"
+  load_balancing_scheme = "INTERNAL_MANAGED"
   network               = module.vpc_network.vpc_id
-  ip_address            = module.public_ip.address
+  subnetwork            = data.google_compute_subnetwork.us-compute-subnetwork.id
+  ip_address            = module.private_ip.address
   region                = local.region
 
   host_rule = {

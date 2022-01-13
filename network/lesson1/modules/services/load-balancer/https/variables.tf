@@ -31,14 +31,46 @@ variable "host_rule" {
   }))
 }
 
+
 # ---------------------------------------------------------------------------------------------------------------------
 # OPTIONAL MODULE PARAMETERS
 # These variables have defaults, but may be overridden by the operator.
 # ---------------------------------------------------------------------------------------------------------------------
-variable "publicly_exposed" {
-  description = "Is the load balancer exposed externally?"
-  type        = bool
-  default     = true
+
+variable "load_balancing_scheme" {
+  description = "This signifies what the ForwardingRule will be used for and can be EXTERNAL, EXTERNAL_MANAGED, INTERNAL OR INTERNAL_MANAGED"
+  type = string
+  default = "EXTERNAL"
+
+  validation {
+    condition = contains(["EXTERNAL","EXTERNAL_MANAGED","INTERNAL","INTERNAL_MANAGED"], var.load_balancing_scheme)
+    error_message = "Required Form: [EXTERNAL, EXTERNAL_MANAGED, INTERNAL, INTERNAL_MANAGED]."
+  }
+}
+
+variable "network_tier" {
+  description = "The networking tier used for configuring this address. default: PREMIUM. PREMIUM | STANDARD"
+  type = string
+  default = "PREMIUM"
+}
+
+variable "region" {
+  description = "Regional load balancer to be created in the following region"
+  type        = string
+  default     = null
+}
+
+variable "network" {
+  description = " For internal load balancing, this field identifies the network that the load balanced IP should belong to for this Forwarding Rule"
+  type        = string
+  default     = null
+}
+
+
+variable "subnetwork" {
+  description = "subnetwork name where the ip will be allocated"
+  type        = string
+  default     = null
 }
 
 variable "enable_ssl" {

@@ -5,6 +5,9 @@ terraform {
   }
 }
 
+provider "google-beta" {
+}
+
 locals {
   network_tier = "STANDARD"
   region       = "us-west1"
@@ -16,6 +19,7 @@ module "host_project_container" {
 
   project_name = "host-project"
   billing_account = var.billing_account
+  network_tier    = "STANDARD"
   service_api     = ["compute.googleapis.com"]
   default_roles   = ["roles/owner"]
 }
@@ -60,7 +64,7 @@ module "vpc_network" {
       source_ranges = ["0.0.0.0/0"]
       rules = [{
         protocol = "tcp"
-        ports = ["80"]
+        ports = ["80","5222"]
       }]
     }
   }
@@ -107,9 +111,12 @@ module "instance_template" {
 
   startup_script = <<EOT
   #!/bin/bash
-  apt-get update
+  apt-get update -y
   apt-get install -y nginx
+  chmod 777 /etc/nginx/sites-enabled/default
+  sed -i -e ":a; s/80/5222/g;" /etc/nginx/sites-enabled/default
   service nginx start
+  service nginx reload
   EOT
 
   nics = [{
@@ -130,9 +137,8 @@ resource "google_compute_health_check" "global_health_check" {
   healthy_threshold = 2
   unhealthy_threshold = 5
 
-  http_health_check {
-    request_path  = "/"
-    port          = 80
+  tcp_health_check {
+    port          = 5222
   }
 
   log_config {
@@ -150,9 +156,8 @@ resource "google_compute_region_health_check" "health_check" {
   healthy_threshold = 2
   unhealthy_threshold = 5
 
-  http_health_check {
-    request_path  = "/"
-    port          = 80
+  tcp_health_check {
+    port          = 5222
   }
 
   log_config {
@@ -176,7 +181,7 @@ module "asg_us" {
   cpu_utilisation = 0.7
 
   named_port = {
-    http: 80
+    tcp: 5222
   }
 
   health_checks = [google_compute_health_check.global_health_check.id]
@@ -184,52 +189,38 @@ module "asg_us" {
   depends_on = [module.host_project_container, module.vpc_network, module.instance_template]
 }
 
-resource "google_compute_region_backend_service" "default" {
+resource "google_compute_backend_service" "default" {
   provider = google-beta
 
   project                         = module.host_project_container.project_id
-  region                          = local.region
   name                            = "backend-service"
-  load_balancing_scheme           = "EXTERNAL_MANAGED"
-  protocol                        = "HTTP"
+  protocol                        = "TCP"
   session_affinity                = "NONE"
+  port_name                       = "tcp"
 
   timeout_sec                     = 10
   connection_draining_timeout_sec = 10
 
-  health_checks = [google_compute_region_health_check.health_check.id]
+  health_checks = [google_compute_health_check.global_health_check.id]
 
   backend {
     balancing_mode = "UTILIZATION"
     group = module.asg_us.instance_group
-    capacity_scaler = 1.0
   }
 
-  depends_on = [module.asg_us, google_compute_region_health_check.health_check]
+  depends_on = [module.asg_us, google_compute_health_check.global_health_check]
 }
 
-module "regional_load_balancer" {
-  source = "../../../../../load-balancer/https"
+module "load_balancer" {
+  source = "../../../../../load-balancer/tcp"
 
-  name = "http-nginx-lb"
+  name = "tcp-nginx-lb"
   project = module.host_project_container.project_id
-  default_service = google_compute_region_backend_service.default.self_link
+  region = local.region
+  default_service = google_compute_backend_service.default.self_link
+  ip_address = module.public_ip.address
+  ip_protocol = "TCP"
+  port_range = "5222"
 
-  load_balancing_scheme = "EXTERNAL_MANAGED"
-  network_tier          = "STANDARD"
-  network               = module.vpc_network.vpc_id
-  ip_address            = module.public_ip.address
-  region                = local.region
-
-  host_rule = {
-    any: {
-      host = "*"
-      default_service = google_compute_region_backend_service.default.self_link
-      path_matcher = {
-        "/": google_compute_region_backend_service.default.self_link
-      }
-    }
-  }
-
-  depends_on = [google_compute_region_backend_service.default]
+  depends_on = [google_compute_backend_service.default]
 }
