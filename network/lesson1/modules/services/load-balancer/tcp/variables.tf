@@ -27,15 +27,33 @@ variable "ip_protocol" {
   type = string
 }
 
-variable port_range {
-  description = "8081-8090"
-  type = string
-}
-
 # ---------------------------------------------------------------------------------------------------------------------
 # OPTIONAL MODULE PARAMETERS
 # These variables have defaults, but may be overridden by the operator.
 # ---------------------------------------------------------------------------------------------------------------------
+
+variable "load_balancing_scheme" {
+  description = "This signifies what the ForwardingRule will be used for and can be EXTERNAL, INTERNAL"
+  type = string
+  default = "EXTERNAL"
+
+  validation {
+    condition = contains(["EXTERNAL","INTERNAL"], var.load_balancing_scheme)
+    error_message = "Required Form: [EXTERNAL, INTERNAL]."
+  }
+}
+
+variable port_range {
+  description = "Used explicit only for external tcp load balancers e.g. 8081-8090"
+  type = string
+  default = null
+}
+
+variable ports {
+  description = "Used explicit only for internal tcp load balancers e.g. [80,8080]"
+  type = list(string)
+  default = null
+}
 
 variable "custom_labels" {
   description = "A map of custom labels to apply to the resources. The key is the label name and the value is the label value."
@@ -45,6 +63,18 @@ variable "custom_labels" {
 
 variable "region" {
   description = "Regional load balancer to be created in the following region"
+  type        = string
+  default     = null
+}
+
+variable "network" {
+  description = " For internal load balancing, this field identifies the network that the load balanced IP should belong to for this Forwarding Rule"
+  type        = string
+  default     = null
+}
+
+variable "subnetwork" {
+  description = "subnetwork name where the ip will be allocated"
   type        = string
   default     = null
 }
