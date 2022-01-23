@@ -14,6 +14,6 @@ output "instance_group_name" {
   value = module.asg_us.instance_group_name
 }
 
-output "public_ip" {
+output "loadbalancer_ip" {
   value = module.private_ip.address
 }
